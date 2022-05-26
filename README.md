@@ -47,7 +47,9 @@ python3 -m main
 ```Request Method```: ```Post``` <br>
 ```Args Example: ```
 ```
-    'wifi_connection_data':'127.0.0.1'
+    {
+     'wifi_connection_data':'127.0.0.1'
+    }
 ```
 
 ```Sucecessful Response: ```
