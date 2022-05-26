@@ -41,26 +41,45 @@ python3 -m main
 
  ##### Api Details
 
-###### Receiving and storing data to connect with robot
+###### Receiving and storing wifi data to connect with robot
 
 ```End Point```: ```/connect-with-robot/``` <br>
 ```Request Method```: ```Post``` <br>
 ```Args Example: ```
 ```
-    'wifi_connection_data':'127.0.0.1',
-    'geofence_location':'968574'
+    'wifi_connection_data':'127.0.0.1'
 ```
 
 ```Sucecessful Response: ```
 ```
     'StatusCode': 200,
-    'message': 'Data has been successfully stored'
+    'message': 'Wifi connection data has been successfully stored'
 ```
 
 ```Unsuccessful Response: ```
 ```
     'StatusCode': 400,
-    'message': 'Please provide wifi connection data and geofence location',
+    'message': 'Wifi connection data is required',
 ```
 
 
+###### Receiving and storing geofence location data
+
+```End Point```: ```/robot-geofence-location/``` <br>
+```Request Method```: ```Post``` <br>
+```Args Example: ```
+```
+    'geofence_location':'987545'
+```
+
+```Sucecessful Response: ```
+```
+    'StatusCode': 200,
+    'message': 'Geofence location data has been successfully stored'
+```
+
+```Unsuccessful Response: ```
+```
+    'StatusCode': 400,
+    'message': 'Geofence location data is required',
+```

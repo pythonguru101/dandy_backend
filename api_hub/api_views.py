@@ -1,6 +1,5 @@
 from ast import Str
 import json
-from typing import Dict
 from flask import (
     Blueprint,
     request,
@@ -32,14 +31,53 @@ def write_json(json_serializable_data: dict, filename: Str) -> None:
 @api_views.route("/connect-with-robot", methods=["POST"])
 def connect_with_robot():
     """
-    This is responsible for receiving wifi connection data and geofence location
-    and exporting it to a json file
+    This is responsible for receiving wifi connection data and exporting it to a json file
 
     Method Type:
         _type_: Post
 
     Args for Post Request:
         wifi_connection_data (str) : data to connect with wifi
+
+    Raises:
+        Exception: raise exception if anything fails
+    """
+    if request.method == "POST":
+        try:
+            if not request.data :
+                raise Exception ("Valid data is required")
+
+            wifi_connection_data = request.json.get("wifi_connection_data",None)
+
+            if not wifi_connection_data:
+                raise Exception ("Wifi connection data is required")
+
+            jsonable_data = {"wifi": wifi_connection_data}
+
+            write_json(
+                json_serializable_data=jsonable_data,
+                filename="store_wifi_connection_data.json",
+            )
+            return jsonify(
+                {
+                    "StatusCode": 200,
+                    "message": "Wifi connection data has been successfully stored",
+                }
+            )
+        except Exception as exp:
+            return jsonify({"StatusCode": 400, "message": str(exp)})
+
+
+@api_views.route("/robot-geofence-location", methods=["POST"])
+def robot_geofence_location():
+    """
+    This is responsible for receiving geofence location
+    and exporting it to a json file
+
+    Method Type:
+        _type_: Post
+
+    Args for Post Request:
         geofence_location (str): geofence location data
 
     Raises:
@@ -47,28 +85,26 @@ def connect_with_robot():
     """
     if request.method == "POST":
         try:
-            wifi_connection_data = request.json.get("wifi_connection_data")
-            geofence_location = request.json.get("geofence_location")
+            if not request.data :
+                raise Exception ("Valid data is required")
 
-            if not wifi_connection_data or not geofence_location:
-                return jsonify(
-                    {
-                        "StatusCode": 400,
-                        "message": "Please provide wifi connection data and geofence location",
-                    }
-                )
+            geofence_location = request.json.get("geofence_location",None)
 
-            jsonable_data = {
-                "wifi": wifi_connection_data,
-                "geofence_location": geofence_location,
-            }
+            if not geofence_location:
+                raise Exception ("Geofence location data is required")
+
+            jsonable_data = {"geofence_location": geofence_location}
 
             write_json(
-                json_serializable_data=jsonable_data, filename="store_house.json"
+                json_serializable_data=jsonable_data,
+                filename="store_geofence_location.json",
             )
 
             return jsonify(
-                {"StatusCode": 200, "message": "Data has been successfully stored"}
+                {
+                    "StatusCode": 200,
+                    "message": "Geofence location data has been successfully stored",
+                }
             )
         except Exception as exp:
             return jsonify({"StatusCode": 400, "message": str(exp)})
