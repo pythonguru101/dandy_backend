@@ -73,7 +73,9 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 __pycache__
+__pycache__/
 .env
+*.pyc
 
 db.sqlite3
 media
