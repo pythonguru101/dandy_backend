@@ -47,21 +47,25 @@ python3 -m main
 ```Request Method```: ```Post``` <br>
 ```Args Example: ```
 ```
-    {
-     'wifi_connection_data':'127.0.0.1'
-    }
+{
+   'wifi_connection_data':'127.0.0.1'
+}
 ```
 
 ```Sucecessful Response: ```
 ```
-    'StatusCode': 200,
-    'message': 'Wifi connection data has been successfully stored'
+{
+   'StatusCode': 200,
+   'message': 'Wifi connection data has been successfully stored'
+}
 ```
 
 ```Unsuccessful Response: ```
 ```
+{
     'StatusCode': 400,
     'message': 'Wifi connection data is required',
+}
 ```
 
 
@@ -71,17 +75,23 @@ python3 -m main
 ```Request Method```: ```Post``` <br>
 ```Args Example: ```
 ```
+{
     'geofence_location':'987545'
+}
 ```
 
 ```Sucecessful Response: ```
 ```
+{
     'StatusCode': 200,
     'message': 'Geofence location data has been successfully stored'
+}
 ```
 
 ```Unsuccessful Response: ```
 ```
+{
     'StatusCode': 400,
     'message': 'Geofence location data is required',
+}
 ```
