@@ -1,10 +1,6 @@
 from ast import Str
 import json
-from flask import (
-    Blueprint,
-    request,
-    jsonify,
-)
+from flask import Blueprint, request, jsonify
 
 api_views = Blueprint("api_views", __name__)
 
@@ -31,80 +27,129 @@ def write_json(json_serializable_data: dict, filename: Str) -> None:
 @api_views.route("/connect-with-robot", methods=["POST"])
 def connect_with_robot():
     """
-    This is responsible for receiving wifi connection data and exporting it to a json file
+    This is responsible for receiving robot connection data and exporting it to a json file
 
     Method Type:
         _type_: Post
 
     Args for Post Request:
-        wifi_connection_data (str) : data to connect with wifi
+        ssid (str) : SSID data
+        password (str) : Password
 
     Raises:
         Exception: raise exception if anything fails
     """
     if request.method == "POST":
         try:
-            if not request.data :
-                raise Exception ("Valid data is required")
+            if not request.data:
+                raise Exception("Valid data is required")
 
-            wifi_connection_data = request.json.get("wifi_connection_data",None)
+            ssid = request.json.get("ssid", None)
+            password = request.json.get("password", None)
 
-            if not wifi_connection_data:
-                raise Exception ("Wifi connection data is required")
+            if not ssid:
+                raise Exception("SSID is required")
+            if not password:
+                raise Exception("Password is required")
 
-            jsonable_data = {"wifi": wifi_connection_data}
+            jsonable_data = {"ssid": ssid, "password": password}
 
             write_json(
                 json_serializable_data=jsonable_data,
-                filename="store_wifi_connection_data.json",
+                filename="store_robot_connection_data.json",
             )
-            return jsonify(
-                {
-                    "StatusCode": 200,
-                    "message": "Wifi connection data has been successfully stored",
-                }
-            )
+
+            response = {
+                "StatusCode": 200,
+                "message": "Successfully connected",
+                "device": {
+                    "id": "Abc123",
+                    "name": "Robot Micro",
+                    "type": "Micro Controller",
+                    "status": "running",
+                    "connection_status": "connected",
+                    "connected_ssid": "458940",
+                    "battery_level": "Highly Charged",
+                    "storage_level": "Full",
+                },
+            }
+            return jsonify(response)
         except Exception as exp:
             return jsonify({"StatusCode": 400, "message": str(exp)})
 
 
-@api_views.route("/robot-geofence-location", methods=["POST"])
-def robot_geofence_location():
+@api_views.route("/robot-location-fencing", methods=["POST"])
+def robot_location_fencing():
     """
-    This is responsible for receiving geofence location
-    and exporting it to a json file
+    This is for fencing robot location
 
     Method Type:
         _type_: Post
 
     Args for Post Request:
-        geofence_location (str): geofence location data
+        coordinates (array) : array of object containing latitude and longitude
+        holes (array) : array of object containing latitude and longitude
 
     Raises:
         Exception: raise exception if anything fails
     """
     if request.method == "POST":
         try:
-            if not request.data :
-                raise Exception ("Valid data is required")
+            if not request.data:
+                raise Exception("Valid data is required")
 
-            geofence_location = request.json.get("geofence_location",None)
-
-            if not geofence_location:
-                raise Exception ("Geofence location data is required")
-
-            jsonable_data = {"geofence_location": geofence_location}
+            fencing_location = request.get_json()
 
             write_json(
-                json_serializable_data=jsonable_data,
-                filename="store_geofence_location.json",
+                json_serializable_data=fencing_location,
+                filename="store_fencing_data.json",
             )
+            response = {
+                "StatusCode": 200,
+                "message": "Data successfully stored",
+                "coordinates": [
+                    {"latitude": 23.2332, "longitude": 23.2332},
+                    {"latitude": 23.2332, "longitude": 23.2332},
+                ],
+                "holes": [
+                    {"latitude": 23.2332, "longitude": 23.2332},
+                    {"latitude": 23.2332, "longitude": 23.2332},
+                ],
+                "id": 0,
+            }
+            return jsonify(response)
+        except Exception as exp:
+            return jsonify({"StatusCode": 400, "message": str(exp)})
 
-            return jsonify(
-                {
-                    "StatusCode": 200,
-                    "message": "Geofence location data has been successfully stored",
-                }
-            )
+
+@api_views.route("/get-robot-current-location", methods=["GET"])
+def robot_current_location():
+    """
+    This is responsible for retrieving robot location
+
+    Method Type:
+        _type_: Get
+
+    Raises:
+        Exception: raise exception if anything fails
+    """
+    if request.method == "GET":
+        try:
+            response = {
+                "StatusCode": 200,
+                "message": "Successfully data retreived",
+                "device": {
+                    "id": "Abc123",
+                    "name": "Robot Micro",
+                    "type": "Micro Controller",
+                    "status": "running",
+                    "connection_status": "connected",
+                    "connected_ssid": "458940",
+                    "battery_level": "Highly Charged",
+                    "storage_level": "Full",
+                },
+                "coordinates": {"latitude": 40.730610, "longitude": -73.953242},
+            }
+            return jsonify(response)
         except Exception as exp:
             return jsonify({"StatusCode": 400, "message": str(exp)})

@@ -41,57 +41,135 @@ python3 -m main
 
  ##### Api Details
 
-###### Receiving and storing wifi data to connect with robot
+###### Connect with Robot
 
-```End Point```: ```/connect-with-robot/``` <br>
+```End Point```: ```/connect-with-robot``` <br>
 ```Request Method```: ```Post``` <br>
 ```Args Example: ```
 ```
 {
-   'wifi_connection_data':'127.0.0.1'
+    "ssid":"49455",
+    "password":"TopSecret"
 }
 ```
 
 ```Sucecessful Response: ```
 ```
 {
-   'StatusCode': 200,
-   'message': 'Wifi connection data has been successfully stored'
+    "StatusCode": 200,
+    "device": {
+        "battery_level": "Highly Charged",
+        "connected_ssid": "458940",
+        "connection_status": "connected",
+        "id": "Abc123",
+        "name": "Robot Micro",
+        "status": "running",
+        "storage_level": "Full",
+        "type": "Micro Controller"
+    },
+    "message": "Successfully connected"
 }
 ```
 
 ```Unsuccessful Response: ```
 ```
 {
-    'StatusCode': 400,
-    'message': 'Wifi connection data is required',
+    "StatusCode": 400,
+    "message": "Password is required"
 }
 ```
 
 
-###### Receiving and storing geofence location data
+###### Fencing Robot Location
 
-```End Point```: ```/robot-geofence-location/``` <br>
+```End Point```: ```/robot-location-fencing``` <br>
 ```Request Method```: ```Post``` <br>
 ```Args Example: ```
 ```
 {
-    'geofence_location':'987545'
+    "coordinates":[
+        {
+            "latitude":23.2332,"longitude": 23.2332
+        },
+        {
+            "latitude":23.2332,"longitude": 23.2332
+        }
+    ],
+    "holes":[
+        {
+            "latitude":23.2332,"longitude": 23.2332
+        },
+        {
+            "latitude":23.2332,"longitude": 23.2332
+        }
+    ],
+    "id":0
 }
 ```
 
 ```Sucecessful Response: ```
 ```
 {
-    'StatusCode': 200,
-    'message': 'Geofence location data has been successfully stored'
+    "StatusCode": 200,
+    "coordinates": [
+        {
+            "latitude": 23.2332,"longitude": 23.2332
+        },
+        {
+            "latitude": 23.2332,"longitude": 23.2332
+        }
+    ],
+    "holes": [
+        {
+            "latitude": 23.2332,"longitude": 23.2332
+        },
+        {
+            "latitude": 23.2332,"longitude": 23.2332
+        }
+    ],
+    "id": 0,
+    "message": "Data successfully stored"
 }
 ```
 
 ```Unsuccessful Response: ```
 ```
 {
-    'StatusCode': 400,
-    'message': 'Geofence location data is required',
+    "StatusCode": 400,
+    "message": "Valid data is required"
+}
+```
+###### Get Robot Current Location
+
+```End Point```: ```/get-robot-current-location``` <br>
+```Request Method```: ```Get``` <br>
+
+```Sucecessful Response: ```
+```
+{
+    "StatusCode": 200,
+    "coordinates": {
+        "latitude": 40.73061,
+        "longitude": -73.953242
+    },
+    "device": {
+        "battery_level": "Highly Charged",
+        "connected_ssid": "458940",
+        "connection_status": "connected",
+        "id": "Abc123",
+        "name": "Robot Micro",
+        "status": "running",
+        "storage_level": "Full",
+        "type": "Micro Controller"
+    },
+    "message": "Successfully data retreived"
+}
+```
+
+```Unsuccessful Response: ```
+```
+{
+    "StatusCode": 400,
+    "message": "Raised error"
 }
 ```

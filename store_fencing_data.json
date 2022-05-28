@@ -1,0 +1,23 @@
+{
+    "coordinates": [
+        {
+            "latitude": 23.2332,
+            "longitude": 23.2332
+        },
+        {
+            "latitude": 23.2332,
+            "longitude": 23.2332
+        }
+    ],
+    "holes": [
+        {
+            "latitude": 23.2332,
+            "longitude": 23.2332
+        },
+        {
+            "latitude": 23.2332,
+            "longitude": 23.2332
+        }
+    ],
+    "id": 0
+}
