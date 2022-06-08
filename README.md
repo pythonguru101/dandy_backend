@@ -162,6 +162,15 @@ python3 -m main
         "storage_level": "Full",
         "type": "Micro Controller"
     },
+    "malfunction": {
+        "clipper": true,
+        "motor": true,
+        "sensor": true,
+        "wheel_1": true,
+        "wheel_2": true,
+        "wheel_3": true,
+        "wheel_4": true
+    },
     "message": "Successfully data retreived"
 }
 ```

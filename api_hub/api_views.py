@@ -149,6 +149,15 @@ def robot_current_location():
                     "storage_level": "Full",
                 },
                 "coordinates": {"latitude": 40.730610, "longitude": -73.953242},
+                "malfunction":{
+                    "wheel_1": True,
+                    "wheel_2": True,
+                    "wheel_3": True,
+                    "wheel_4": True,
+                    "sensor": True,
+                    "motor": True,
+                    "clipper": True,
+                }
             }
             return jsonify(response)
         except Exception as exp:
