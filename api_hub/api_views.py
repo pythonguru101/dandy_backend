@@ -1,5 +1,8 @@
 from ast import Str
 import json
+import socket
+import os
+from shlex import quote
 from flask import Blueprint, request, jsonify
 
 api_views = Blueprint("api_views", __name__)
@@ -52,8 +55,19 @@ def connect_with_robot():
             if not password:
                 raise Exception("Password is required")
 
-            jsonable_data = {"ssid": ssid, "password": password}
+            if "dandy-robot" in socket.gethostname():
+                command = 'nmcli dev wifi connect "{}" password "{}" ifname wlan0'.format(
+                    quote(ssid), quote(password)
+                )  # quote escapes string to avoid security risk
+                # print(command)
+                return_val = os.system(command)
 
+                if return_val != 0:
+                    raise Exception("Unable to connect to wifi network with these credentials")
+
+            
+            # todo remove json output for production
+            jsonable_data = {"ssid": ssid, "password": password}
             write_json(
                 json_serializable_data=jsonable_data,
                 filename="store_robot_connection_data.json",
