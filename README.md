@@ -182,3 +182,49 @@ python3 -m main
     "message": "Raised error"
 }
 ```
+###### Check Update
+
+```End Point```: ```/check-update``` <br>
+```Request Method```: ```Get``` <br>
+
+```Sucecessful Response: ```
+```
+{
+    "StatusCode": 200,
+    "is_available_update":True
+}
+```
+
+```Unsuccessful Response: ```
+```
+{
+    "StatusCode": 400,
+    "message": "Raised error"
+}
+```
+###### Update Software
+
+```End Point```: ```/update-software``` <br>
+```Request Method```: ```Post``` <br>
+```Args Example: ```
+```
+{
+    "is_update_available": True
+}
+```
+
+```Sucecessful Response: ```
+```
+{
+    "StatusCode": 200,
+    "message": "Software update available data successfully passed"
+}
+```
+
+```Unsuccessful Response: ```
+```
+{
+    "StatusCode": 400,
+    "message": "is_update_available field is required"
+}
+```

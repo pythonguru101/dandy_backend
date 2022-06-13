@@ -3,6 +3,7 @@ import json
 import socket
 import os
 from shlex import quote
+from urllib import response
 from flask import Blueprint, request, jsonify
 
 api_views = Blueprint("api_views", __name__)
@@ -63,9 +64,10 @@ def connect_with_robot():
                 return_val = os.system(command)
 
                 if return_val != 0:
-                    raise Exception("Unable to connect to wifi network with these credentials")
+                    raise Exception(
+                        "Unable to connect to wifi network with these credentials"
+                    )
 
-            
             # todo remove json output for production
             jsonable_data = {"ssid": ssid, "password": password}
             write_json(
@@ -163,7 +165,7 @@ def robot_current_location():
                     "storage_level": "Full",
                 },
                 "coordinates": {"latitude": 40.730610, "longitude": -73.953242},
-                "malfunction":{
+                "malfunction": {
                     "wheel_1": True,
                     "wheel_2": True,
                     "wheel_3": True,
@@ -171,7 +173,58 @@ def robot_current_location():
                     "sensor": True,
                     "motor": True,
                     "clipper": True,
-                }
+                },
+            }
+            return jsonify(response)
+        except Exception as exp:
+            return jsonify({"StatusCode": 400, "message": str(exp)})
+
+
+@api_views.route("/check-update", methods=["GET"])
+def check_update() -> object:
+    """
+    This is to check any available update
+
+    Returns:
+        object: response containing status code and a boolean field
+    """
+    if request.method == "GET":
+        try:
+            response = {"StatusCode": 200, "is_available_update": True}
+            return jsonify(response)
+        except Exception as exp:
+            return jsonify({"StatusCode": 400, "message": str(exp)})
+
+
+@api_views.route("/update-software", methods=["POST"])
+def update_software() -> object:
+    """
+    This is to push software update available indication
+
+    Args for Post Request:
+        is_update_available (bool) :True or False
+
+    Returns:
+        object: response containg status and message
+    """
+    if request.method == "POST":
+        try:
+            if not request.data:
+                raise Exception("Valid data is required")
+
+            is_update_available = request.json.get("is_update_available", None)
+            if not is_update_available:
+                raise Exception("is_update_available field is required")
+
+            jsonable_data = {"is_update_available": is_update_available}
+
+            write_json(
+                json_serializable_data=jsonable_data,
+                filename="software_update_available.json",
+            )
+            response = {
+                "StatusCode": 200,
+                "message": "Software update available data successfully passed",
             }
             return jsonify(response)
         except Exception as exp:
