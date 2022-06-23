@@ -4,7 +4,10 @@ import socket
 import os
 from shlex import quote
 from urllib import response
+import subprocess
 from flask import Blueprint, request, jsonify
+
+from api_hub import update
 
 api_views = Blueprint("api_views", __name__)
 
@@ -120,6 +123,22 @@ def robot_location_fencing():
                 json_serializable_data=fencing_location,
                 filename="store_fencing_data.json",
             )
+
+
+            if "dandy-robot" in socket.gethostname():
+                os.makedirs("/home/mendel/settings/", exist_ok=True)
+                raw_geofence_filepath = "/home/mendel/settings/geofence_raw.csv"
+
+                with open(raw_geofence_filepath, "w") as f:
+                    for i in fencing_location["coordinates"]:
+                        lat = i["latitude"]
+                        lon = i["longitude"]
+                        f.write(str(lat) + "," + str(lon) + "\n")
+
+                command = "ros2 service call /update_geofence std_srvs/srv/Trigger {}"
+                subprocess.call(command.split(" "))
+
+
             response = {
                 "StatusCode": 200,
                 "message": "Data successfully stored",
@@ -189,8 +208,13 @@ def check_update() -> object:
         object: response containing status code and a boolean field
     """
     if request.method == "GET":
+        is_available = False
+        if "dandy-robot" in socket.gethostname():
+            new_version = update.checkForUpdate()
+            print(new_version)
+            is_available = new_version is not None
         try:
-            response = {"StatusCode": 200, "is_available_update": True}
+            response = {"StatusCode": 200, "is_available_update": is_available}
             return jsonify(response)
         except Exception as exp:
             return jsonify({"StatusCode": 400, "message": str(exp)})
@@ -205,7 +229,7 @@ def update_software() -> object:
         is_update_available (bool) :True or False
 
     Returns:
-        object: response containg status and message
+        object: response containing status and message
     """
     if request.method == "POST":
         try:
@@ -222,6 +246,12 @@ def update_software() -> object:
                 json_serializable_data=jsonable_data,
                 filename="software_update_available.json",
             )
+
+            if "dandy-robot" in socket.gethostname():
+                download_success = update.downloadUpdate()
+                if download_success:
+                    update.applyDownloadedUpdate()
+
             response = {
                 "StatusCode": 200,
                 "message": "Software update available data successfully passed",
