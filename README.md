@@ -63,6 +63,7 @@ python3 -m main
         "connection_status": "connected",
         "id": "Abc123",
         "name": "Robot Micro",
+        "serial_number": "SL1256489V",
         "status": "running",
         "storage_level": "Full",
         "type": "Micro Controller"
@@ -158,6 +159,7 @@ python3 -m main
         "connection_status": "connected",
         "id": "Abc123",
         "name": "Robot Micro",
+        "serial_number": "SL1256489V",
         "status": "running",
         "storage_level": "Full",
         "type": "Micro Controller"

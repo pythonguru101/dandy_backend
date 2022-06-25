@@ -84,6 +84,7 @@ def connect_with_robot():
                 "device": {
                     "id": "Abc123",
                     "name": "Robot Micro",
+                    "serial_number":"SL1256489V",
                     "type": "Micro Controller",
                     "status": "running",
                     "connection_status": "connected",
@@ -176,6 +177,7 @@ def robot_current_location():
                 "device": {
                     "id": "Abc123",
                     "name": "Robot Micro",
+                    "serial_number":"SL1256489V",
                     "type": "Micro Controller",
                     "status": "running",
                     "connection_status": "connected",
