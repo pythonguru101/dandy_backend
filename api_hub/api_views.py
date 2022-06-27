@@ -31,6 +31,36 @@ def write_json(json_serializable_data: dict, filename: Str) -> None:
         raise Exception("Could not save data in json file")
 
 
+# this is for pinging the server
+@api_views.route("/", methods=["GET"])
+def ping():
+    """
+    This is responsible for pinging the server
+
+    Returns:
+        str: returns a string "pong"
+    """
+    response = {
+                "message": "Available", 
+                "status": "success", 
+                "StatusCode": 200,
+                "ip": socket.gethostbyname(socket.gethostname()),
+                "device": {
+                    "id": "Abc123",
+                    "name": "dandy_robot_5000",
+                    "serial_number":"5000",
+                    "type": "Micro Controller",
+                    "status": "running",
+                    "connection_status": "connected",
+                    "connected_ssid": "458940",
+                    "battery_level": "Highly Charged",
+                    "storage_level": "Full",
+                },
+                }
+    
+    return jsonify(response)
+
+
 @api_views.route("/connect-with-robot", methods=["POST"])
 def connect_with_robot():
     """
@@ -84,6 +114,7 @@ def connect_with_robot():
                 "device": {
                     "id": "Abc123",
                     "name": "Robot Micro",
+                    "serial_number":"5000",
                     "type": "Micro Controller",
                     "status": "running",
                     "connection_status": "connected",
@@ -176,6 +207,7 @@ def robot_current_location():
                 "device": {
                     "id": "Abc123",
                     "name": "Robot Micro",
+                    "serial_number":"5000",
                     "type": "Micro Controller",
                     "status": "running",
                     "connection_status": "connected",
