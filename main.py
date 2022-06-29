@@ -1,3 +1,5 @@
+# © 2022, Dandy technology LLC
+
 from api_hub import settings_api_hub
 from waitress import serve
 import sys

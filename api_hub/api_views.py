@@ -1,3 +1,5 @@
+# © 2022, Dandy technology LLC
+
 from ast import Str
 import json
 import socket

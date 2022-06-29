@@ -1,3 +1,5 @@
+# © 2022, Dandy technology LLC
+
 import os
 import subprocess
 import tarfile
