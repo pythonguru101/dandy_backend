@@ -2,8 +2,10 @@ import os
 import subprocess
 import tarfile
 import shutil
+import json
 
 from distutils.version import StrictVersion
+
 
 def checkForUpdate():
     current_version = "0.0.0"
@@ -13,10 +15,9 @@ def checkForUpdate():
     print("Current version: " + current_version)
 
     # get available versions
-    command = "ssh ftp ls -l /home/dandy/updates"
-    output = subprocess.check_output(command.split(" ")).decode("utf-8").strip()
-    lines = output.splitlines()
-    lines = lines[1:]  # remove unneeded first line
+    command = "curl -X GET http://34.150.168.90:1818/get_updates -H 'Content-Type:application/json'"
+    output = subprocess.check_output(command.split(" "))
+    lines  = json.loads(output)
 
     versions = []
     for line in lines:
@@ -38,12 +39,13 @@ def checkForUpdate():
     next_version = versions[current_version_index + 1]
     return next_version
 
+
 def downloadUpdate():
     next_version = checkForUpdate()
     if next_version is None:
         return
 
-    print('Starting download')
+    print("Starting download")
 
     # empty update folder
     update_folder = "/home/mendel/updates/"
@@ -52,21 +54,26 @@ def downloadUpdate():
     os.makedirs(update_folder)
 
     # download next version
-    remote_tarball_filepath = "/home/dandy/updates/" + next_version + ".tar.xz"
-    command = "rsync ftp:" + remote_tarball_filepath + " " + update_folder
+    encrypted_tarball_filepath = update_folder + next_version + ".bin"
+    command = "curl -X GET http://34.150.168.90:1818/download_update/" + next_version + ".tar.xz --output " + encrypted_tarball_filepath
+    subprocess.call(command.split(" "))
+
+    # decrypt
+    decrypted_tarball_filepath = update_folder + next_version + ".tar.xz"
+    command = "openssl enc -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 -salt -k fordandyroboteyesonly -d -in "  + encrypted_tarball_filepath + " -out " + decrypted_tarball_filepath
     subprocess.call(command.split(" "))
 
     # unpack new version
-    tarball_filepath = update_folder + next_version + ".tar.xz"
-    with tarfile.open(tarball_filepath) as f:
+    with tarfile.open(decrypted_tarball_filepath) as f:
         f.extractall(update_folder)
-    # new_version_path = update_folder + next_version
 
-    # remove tarball
-    os.remove(tarball_filepath)
+    # remove tarballs
+    os.remove(encrypted_tarball_filepath)
+    os.remove(decrypted_tarball_filepath)
 
-    print('Download and extraction done')
+    print("Download and extraction done")
     return True
+
 
 def applyDownloadedUpdate():
     # check for downloaded version
@@ -103,7 +110,7 @@ def applyDownloadedUpdate():
     # move new version in place
     os.rename(new_version_path, "/home/mendel/projects/dandy_software")
 
-    print('move done')
+    print("move done")
 
     # run post install
     postinstall_path = new_version_path + "/post_install.sh"
@@ -111,18 +118,19 @@ def applyDownloadedUpdate():
         command = "sudo bash " + postinstall_path
         subprocess.call(command.split(" "))
 
-    print('post install done')
+    print("post install done")
 
     # move uninstall script
     uninstall_path = new_version_path + "/uninstall.sh"
     if os.path.exists(uninstall_path):
         shutil.copy(uninstall_path, "/home/mendel/projects/dandy_software/scripts/")
 
-    print('Install done, rebooting now')
+    print("Install done, rebooting now")
 
     # reboot
     command = "sudo reboot now"
     subprocess.call(command.split(" "))
+
 
 def rollback():
     # Run uninstall script
@@ -132,5 +140,5 @@ def rollback():
         subprocess.call(command.split(" "))
 
     if os.path.isdir("/home/mendel/projects/dandy_software_backup"):
-        shutil.rmtree("/home/mendel/projects/dandy_software") 
+        shutil.rmtree("/home/mendel/projects/dandy_software")
         shutil.copy("/home/mendel/projects/dandy_software_backup", "/home/mendel/projects/dandy_software")
