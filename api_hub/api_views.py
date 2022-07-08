@@ -7,7 +7,7 @@ import os
 from shlex import quote
 from urllib import response
 import subprocess
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 
 from api_hub import update
 
@@ -42,24 +42,25 @@ def ping():
     Returns:
         str: returns a string "pong"
     """
+    serial = socket.gethostname().split("-")[-1]
     response = {
-                "message": "Available", 
-                "status": "success", 
-                "StatusCode": 200,
-                "ip": socket.gethostbyname(socket.gethostname()),
-                "device": {
-                    "id": "Abc123",
-                    "name": "dandy_robot_5000",
-                    "serial_number":"5000",
-                    "type": "Micro Controller",
-                    "status": "running",
-                    "connection_status": "connected",
-                    "connected_ssid": "458940",
-                    "battery_level": "Highly Charged",
-                    "storage_level": "Full",
-                },
-                }
-    
+        "message": "Available",
+        "status": "success",
+        "StatusCode": 200,
+        "ip": socket.gethostbyname(socket.gethostname()),
+        "device": {
+            "id": "Abc123",
+            "name": "dandy_robot_5000",
+            "serial_number": serial,
+            "type": "Micro Controller",
+            "status": "running",
+            "connection_status": "connected",
+            "connected_ssid": "458940",
+            "battery_level": "Highly Charged",
+            "storage_level": "Full",
+        },
+    }
+
     return jsonify(response)
 
 
@@ -99,9 +100,7 @@ def connect_with_robot():
                 return_val = os.system(command)
 
                 if return_val != 0:
-                    raise Exception(
-                        "Unable to connect to wifi network with these credentials"
-                    )
+                    raise Exception("Unable to connect to wifi network with these credentials")
 
             # todo remove json output for production
             jsonable_data = {"ssid": ssid, "password": password}
@@ -110,13 +109,15 @@ def connect_with_robot():
                 filename="store_robot_connection_data.json",
             )
 
+            serial = socket.gethostname().split("-")[-1]
+
             response = {
                 "StatusCode": 200,
                 "message": "Successfully connected",
                 "device": {
                     "id": "Abc123",
                     "name": "Robot Micro",
-                    "serial_number":"5000",
+                    "serial_number": serial,
                     "type": "Micro Controller",
                     "status": "running",
                     "connection_status": "connected",
@@ -157,7 +158,6 @@ def robot_location_fencing():
                 filename="store_fencing_data.json",
             )
 
-
             if "dandy-robot" in socket.gethostname():
                 os.makedirs("/home/mendel/settings/", exist_ok=True)
                 raw_geofence_filepath = "/home/mendel/settings/geofence_raw.csv"
@@ -170,7 +170,6 @@ def robot_location_fencing():
 
                 command = "ros2 service call /update_geofence std_srvs/srv/Trigger {}"
                 subprocess.call(command.split(" "))
-
 
             response = {
                 "StatusCode": 200,
@@ -203,13 +202,22 @@ def robot_current_location():
     """
     if request.method == "GET":
         try:
+            serial = 0
+            latitude = 0
+            longitude = 0
+            if "dandy-robot" in socket.gethostname():
+                serial = socket.gethostname().split("-")[-1]
+                line = subprocess.check_output(["tail", "-1", "/home/mendel/results.txt"])
+                tokens = str(line).split(",")
+                latitude = float(tokens[1])
+                longitude = float(tokens[2])
             response = {
                 "StatusCode": 200,
-                "message": "Successfully data retreived",
+                "message": "Successfully data retrieved",
                 "device": {
                     "id": "Abc123",
                     "name": "Robot Micro",
-                    "serial_number":"5000",
+                    "serial_number": serial,
                     "type": "Micro Controller",
                     "status": "running",
                     "connection_status": "connected",
@@ -217,7 +225,7 @@ def robot_current_location():
                     "battery_level": "Highly Charged",
                     "storage_level": "Full",
                 },
-                "coordinates": {"latitude": 40.730610, "longitude": -73.953242},
+                "coordinates": {"latitude": latitude, "longitude": longitude},
                 "malfunction": {
                     "wheel_1": True,
                     "wheel_2": True,
@@ -229,6 +237,27 @@ def robot_current_location():
                 },
             }
             return jsonify(response)
+        except Exception as exp:
+            return jsonify({"StatusCode": 400, "message": str(exp)})
+
+
+@api_views.route("/get-robot-history", methods=["GET"])
+def robot_history():
+    """
+    This is responsible for retrieving a file containing the robot history of weed detections and fertilizer/water deficiency
+
+    Method Type:
+        _type_: Get
+
+    Raises:
+        Exception: raise exception if anything fails
+    """
+    if request.method == "GET":
+        try:
+            if "dandy-robot" in socket.gethostname():
+                return send_file("/home/mendel/results.txt")
+            else:
+                return jsonify({"StatusCode": 204, "message": "No file to send"})
         except Exception as exp:
             return jsonify({"StatusCode": 400, "message": str(exp)})
 
