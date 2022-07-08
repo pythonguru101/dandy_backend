@@ -322,3 +322,47 @@ def update_software() -> object:
             return jsonify(response)
         except Exception as exp:
             return jsonify({"StatusCode": 400, "message": str(exp)})
+
+
+# post request stub to start download of update with the endpoint /download-update
+
+
+@api_views.route("/download-update", methods=["POST"])  
+def download_update() -> object:
+    """
+    This is to push software update available indication
+
+    Args for Post Request:
+        is_update_available (bool) :True or False
+
+    Returns:
+        object: response containing status and message
+    """
+    if request.method == "POST":
+        try:
+            if not request.data:
+                raise Exception("Valid data is required")
+
+            is_download_available = request.json.get("is_download_available", None)
+            if not is_download_available:
+                raise Exception("is_download_available field is required")
+
+            jsonable_data = {"is_download_available": is_download_available}
+
+            write_json(
+                json_serializable_data=jsonable_data,
+                filename="software_download_available.json",
+            )
+
+            if "dandy-robot" in socket.gethostname():
+                download_success = update.downloadUpdate()
+                if download_success:
+                    update.applyDownloadedUpdate()
+
+            response = {
+                "StatusCode": 200,
+                "message": "Software update available data successfully passed",
+            }
+            return jsonify(response)
+        except Exception as exp:
+            return jsonify({"StatusCode": 400, "message": str(exp)})
