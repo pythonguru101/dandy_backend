@@ -210,13 +210,21 @@ def check_update() -> object:
         object: response containing status code and a boolean field
     """
     if request.method == "GET":
+        # Get software file name and size
+        file_location = "/home/faizullah/Desktop/dandy_backend_official/dandy_backend/bavarian-calculator.pdf"
+        file_size = os.path.getsize(file_location)
+        file_size = str(file_size)+' bytes'
         is_available = False
         if "dandy-robot" in socket.gethostname():
             new_version = update.checkForUpdate()
             print(new_version)
             is_available = new_version is not None
         try:
-            response = {"StatusCode": 200, "is_available_update": is_available}
+            response = {
+                "StatusCode": 200,
+                "is_available_update": is_available,
+                "updated_file_size": file_size
+            }
             return jsonify(response)
         except Exception as exp:
             return jsonify({"StatusCode": 400, "message": str(exp)})
