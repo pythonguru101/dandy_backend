@@ -189,11 +189,12 @@ python3 -m main
 ```End Point```: ```/check-update``` <br>
 ```Request Method```: ```Get``` <br>
 
-```Sucecessful Response: ```
+```Successful Response: ```
 ```
 {
     "StatusCode": 200,
-    "is_available_update":True
+    "is_available_update":True,
+    "updated_file_size":61079 bytes
 }
 ```
 
